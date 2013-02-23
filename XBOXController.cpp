@@ -88,18 +88,62 @@ void main()
 
     while(true){ 	
         if(player1->IsXBOXControlConnected()){
-			if(player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_A)
+        	XINPUT_GAMEPAD gamepad = player1->GetState().Gamepad;
+        	WORD pressed = player1->GetState().Gamepad.wButtons;
+			if(pressed & XINPUT_GAMEPAD_A)
 			{  
-				cout << "A detected!\n";
-				player1->Vibrate(65535, 0); }
-
-			if(player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_B)
+				cout << "A";
+//				player1->Vibrate(65535, 0);
+			}
+			if(pressed & XINPUT_GAMEPAD_B)
 			{ 
-				cout << "B detected!\n";
-				player1->Vibrate(0, 65535); }
+				cout << "B";
+//				player1->Vibrate(0, 65535);
+			}
 
-			if(player1->GetState().Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
-			{ break; }
+			if(pressed & XINPUT_GAMEPAD_BACK)
+			{
+				cout<<"Back";
+//				break;
+
+			}
+			if(pressed & XINPUT_GAMEPAD_Y) {
+				cout<<"Y";
+			}
+			if(pressed & XINPUT_GAMEPAD_X) {
+				cout<<"X";
+			}
+			if(pressed & XINPUT_GAMEPAD_START) {
+				cout<<"Start";
+			}
+			if(pressed & XINPUT_GAMEPAD_DPAD_DOWN) {
+				cout<<"DPad_Down";
+			}
+			if(pressed & XINPUT_GAMEPAD_DPAD_UP) {
+				cout<<"DPad_Up";
+			}
+			if(pressed & XINPUT_GAMEPAD_DPAD_LEFT) {
+				cout<<"Dpad_Left";
+			}
+			if(pressed & XINPUT_GAMEPAD_DPAD_RIGHT) {
+				cout<<"DPad_Right";
+			}
+			if(pressed & XINPUT_GAMEPAD_LEFT_SHOULDER) {
+				cout<<"Left_Shoulder";
+			}
+			if(pressed & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+				cout<<"Right_Shoulder";
+			}
+			cout<<endl;
+//			if(pressed & XINPUT_GAMEPAD_) {
+//				cout<<"X";
+//			}
+			if(gamepad.bLeftTrigger>0) {
+				cout<<(unsigned int)(player1->GetState().Gamepad.bLeftTrigger)<<endl;
+			}
+			if(gamepad.bRightTrigger>0) {
+				cout<<(unsigned int)(player1->GetState().Gamepad.bRightTrigger)<<endl;
+			}
 		}
 		else{
 
