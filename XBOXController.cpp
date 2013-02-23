@@ -92,57 +92,67 @@ void main()
         	WORD pressed = player1->GetState().Gamepad.wButtons;
 			if(pressed & XINPUT_GAMEPAD_A)
 			{  
-				cout << "A";
+				cout << " A ";
 //				player1->Vibrate(65535, 0);
 			}
 			if(pressed & XINPUT_GAMEPAD_B)
 			{ 
-				cout << "B";
+				cout << " B ";
 //				player1->Vibrate(0, 65535);
 			}
 
 			if(pressed & XINPUT_GAMEPAD_BACK)
 			{
-				cout<<"Back";
+				cout<<" BACK  ";
 //				break;
 
 			}
 			if(pressed & XINPUT_GAMEPAD_Y) {
-				cout<<"Y";
+				cout<<" Y ";
 			}
 			if(pressed & XINPUT_GAMEPAD_X) {
-				cout<<"X";
+				cout<<" X  ";
 			}
 			if(pressed & XINPUT_GAMEPAD_START) {
-				cout<<"Start";
+				cout<<" START ";
 			}
 			if(pressed & XINPUT_GAMEPAD_DPAD_DOWN) {
-				cout<<"DPad_Down";
+				cout<<" DPAD_DOWN ";
 			}
 			if(pressed & XINPUT_GAMEPAD_DPAD_UP) {
-				cout<<"DPad_Up";
+				cout<<" DPAD_UP ";
 			}
 			if(pressed & XINPUT_GAMEPAD_DPAD_LEFT) {
-				cout<<"Dpad_Left";
+				cout<<" DPAD_LEFT ";
 			}
 			if(pressed & XINPUT_GAMEPAD_DPAD_RIGHT) {
-				cout<<"DPad_Right";
+				cout<<" DPAD_RIGHT ";
 			}
 			if(pressed & XINPUT_GAMEPAD_LEFT_SHOULDER) {
-				cout<<"Left_Shoulder";
+				cout<<" LEFT_SHOULDER ";
 			}
 			if(pressed & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-				cout<<"Right_Shoulder";
+				cout<<" RIGHT_SHOULDER ";
 			}
 			cout<<endl;
 //			if(pressed & XINPUT_GAMEPAD_) {
 //				cout<<"X";
 //			}
 			if(gamepad.bLeftTrigger>0) {
+				cout<<"LEFT_TRIGGER: ";
 				cout<<(unsigned int)(player1->GetState().Gamepad.bLeftTrigger)<<endl;
 			}
 			if(gamepad.bRightTrigger>0) {
+				cout<<"RIGHT_TRIGGER: ";
 				cout<<(unsigned int)(player1->GetState().Gamepad.bRightTrigger)<<endl;
+			}
+			if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_TRIGGER_THRESHOLD>0) {
+				cout<<"LEFT_THUMB_Y: ";
+				cout<<(unsigned int)(player1->GetState().Gamepad.sThumbLY)<<endl;
+			}
+			if(abs(gamepad.sThumbRY)-XINPUT_GAMEPAD_TRIGGER_THRESHOLD>0) {
+				cout<<"RIGHT_THUMB_Y: ";
+				cout<<(unsigned int)(player1->GetState().Gamepad.sThumbRY)<<endl;
 			}
 		}
 		else{
