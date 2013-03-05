@@ -8,31 +8,23 @@
 //
 // Constants for gamepad buttons
 //
-#include <Windows.h>
-#include "XBOXController.h"
+
+
 #include <iostream>
-
-
-#define XINPUT_GAMEPAD_DPAD_UP          0x0001
-#define XINPUT_GAMEPAD_DPAD_DOWN        0x0002
-#define XINPUT_GAMEPAD_DPAD_LEFT        0x0004
-#define XINPUT_GAMEPAD_DPAD_RIGHT       0x0008
-#define XINPUT_GAMEPAD_START            0x0010
-#define XINPUT_GAMEPAD_BACK             0x0020
-#define XINPUT_GAMEPAD_LEFT_THUMB       0x0040
-#define XINPUT_GAMEPAD_RIGHT_THUMB      0x0080
-#define XINPUT_GAMEPAD_LEFT_SHOULDER    0x0100
-#define XINPUT_GAMEPAD_RIGHT_SHOULDER   0x0200
-#define XINPUT_GAMEPAD_A                0x1000
-#define XINPUT_GAMEPAD_B                0x2000
-#define XINPUT_GAMEPAD_X                0x4000
-#define XINPUT_GAMEPAD_Y                0x8000
+#include <sstream>
+#include "Client.h"
+#include "XBOXController.h"
+#include <Windows.h>
 
 using namespace std;
 
 
-XBOXController::XBOXController(int num) {
+XBOXController::XBOXController(int num, int port) {
+	XBOXController::port = port;
 	XBOX_CONTROLLER_NUM = num;
+	currentHopperSpeed = 0;
+	currentLeftSide = 0;
+	currentRightSide = 0;
 }
 
 bool XBOXController::IsXBOXControlConnected()
@@ -77,7 +69,7 @@ XINPUT_STATE XBOXController::GetState()
 
 void main()
 {
-   XBOXController* player1 = new XBOXController(0); 
+   XBOXController* player0 = new XBOXController(0, 2000);
 
    system("color 0a"); 
 
@@ -87,73 +79,9 @@ void main()
     cout << "Press [BACK] to exit\n";          
 
     while(true){ 	
-        if(player1->IsXBOXControlConnected()){
-        	XINPUT_GAMEPAD gamepad = player1->GetState().Gamepad;
-        	WORD pressed = player1->GetState().Gamepad.wButtons;
-			if(pressed & XINPUT_GAMEPAD_A)
-			{  
-				cout << " A ";
-//				player1->Vibrate(65535, 0);
-			}
-			if(pressed & XINPUT_GAMEPAD_B)
-			{ 
-				cout << " B ";
-//				player1->Vibrate(0, 65535);
-			}
+        if(player0->IsXBOXControlConnected()){
+        	player0->readControllerInput();
 
-			if(pressed & XINPUT_GAMEPAD_BACK)
-			{
-				cout<<" BACK  ";
-//				break;
-
-			}
-			if(pressed & XINPUT_GAMEPAD_Y) {
-				cout<<" Y ";
-			}
-			if(pressed & XINPUT_GAMEPAD_X) {
-				cout<<" X  ";
-			}
-			if(pressed & XINPUT_GAMEPAD_START) {
-				cout<<" START ";
-			}
-			if(pressed & XINPUT_GAMEPAD_DPAD_DOWN) {
-				cout<<" DPAD_DOWN ";
-			}
-			if(pressed & XINPUT_GAMEPAD_DPAD_UP) {
-				cout<<" DPAD_UP ";
-			}
-			if(pressed & XINPUT_GAMEPAD_DPAD_LEFT) {
-				cout<<" DPAD_LEFT ";
-			}
-			if(pressed & XINPUT_GAMEPAD_DPAD_RIGHT) {
-				cout<<" DPAD_RIGHT ";
-			}
-			if(pressed & XINPUT_GAMEPAD_LEFT_SHOULDER) {
-				cout<<" LEFT_SHOULDER ";
-			}
-			if(pressed & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
-				cout<<" RIGHT_SHOULDER ";
-			}
-			cout<<endl;
-//			if(pressed & XINPUT_GAMEPAD_) {
-//				cout<<"X";
-//			}
-			if(gamepad.bLeftTrigger>0) {
-				cout<<"LEFT_TRIGGER: ";
-				cout<<(unsigned int)(player1->GetState().Gamepad.bLeftTrigger)<<endl;
-			}
-			if(gamepad.bRightTrigger>0) {
-				cout<<"RIGHT_TRIGGER: ";
-				cout<<(unsigned int)(player1->GetState().Gamepad.bRightTrigger)<<endl;
-			}
-			if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_TRIGGER_THRESHOLD>0) {
-				cout<<"LEFT_THUMB_Y: ";
-				cout<<(unsigned int)(player1->GetState().Gamepad.sThumbLY)<<endl;
-			}
-			if(abs(gamepad.sThumbRY)-XINPUT_GAMEPAD_TRIGGER_THRESHOLD>0) {
-				cout<<"RIGHT_THUMB_Y: ";
-				cout<<(unsigned int)(player1->GetState().Gamepad.sThumbRY)<<endl;
-			}
 		}
 		else{
 
@@ -162,8 +90,133 @@ void main()
 					cin.get();
 					break;
 		}
+        Sleep(50);
 
-	 
      }
-	//delete player1;
 }
+
+void XBOXController::readControllerInput() {
+	XINPUT_GAMEPAD gamepad = GetState().Gamepad;//player0->GetState().Gamepad;
+	WORD pressed = GetState().Gamepad.wButtons;//player0->GetState().Gamepad.wButtons;
+	string pressedButtons = "";
+
+	if(pressed & XINPUT_GAMEPAD_B)
+	{
+		std::stringstream s;
+		s<<STOP_CMD;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_BACK)
+	{
+		std::stringstream s;
+		s<<AUTO_MANUAL_TOGGLE;
+		sendData(s.str());
+
+	}
+
+	if(pressed & XINPUT_GAMEPAD_Y) {
+		std::stringstream s;
+		s<<RUN_HOPPER;
+		currentHopperSpeed = 0;
+		s<<sizeof(currentHopperSpeed);
+		s<<currentHopperSpeed;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_X) {
+		std::stringstream s;
+		s<<STOP_HOPPER;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_START) {
+		std::stringstream s;
+		s<<START_CMD;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_DPAD_DOWN) {
+		currentHopperSpeed--;
+		std::stringstream s;
+		s<<RUN_HOPPER;
+		s<<sizeof(currentHopperSpeed);
+		s<<currentHopperSpeed;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_DPAD_UP) {
+		currentHopperSpeed++;
+		std::stringstream s;
+		s<<RUN_HOPPER;
+		s<<sizeof(currentHopperSpeed);
+		s<<currentHopperSpeed;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_DPAD_LEFT) {
+		std::stringstream s;
+		s<<TEST_MODE_TOGGLE;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_LEFT_SHOULDER) {
+		std::stringstream s;
+		s<<RAISE_LADDER;
+		sendData(s.str());
+	}
+
+	if(gamepad.bLeftTrigger>0) {
+		std::stringstream s;
+		s<<LOWER_LADDER;
+		int leftTrigger = gamepad.bLeftTrigger;
+		s<<sizeof(leftTrigger);
+		s<<leftTrigger;
+		sendData(s.str());
+	}
+	if(gamepad.bRightTrigger>0) {
+		std::stringstream s;
+		s<<RUN_LADDER;
+		int rightTrigger = gamepad.bRightTrigger;
+		s<<sizeof(rightTrigger);
+		s<<rightTrigger;
+		sendData(s.str());
+	}
+
+	if(abs(gamepad.sThumbRY)-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE>0 && gamepad.sThumbRY<32768) {
+		std::stringstream s;
+		s<<CHANGE_DIRECTION;
+		currentRightSide = gamepad.sThumbRY;
+//		cout<<currentRightSide<<endl;
+		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
+		s<<currentRightSide;
+		s<<currentLeftSide;
+		sendData(s.str());
+	}
+	if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE>0 && gamepad.sThumbLY<32768) {
+		std::stringstream s;
+		s<<CHANGE_DIRECTION;
+		currentLeftSide = gamepad.sThumbLY;
+		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
+		s<<currentRightSide;
+		s<<currentLeftSide;
+		sendData(s.str());
+	}
+
+}
+
+
+bool XBOXController::sendData(std::string message) {
+	int messageLength = message.size();
+	if(messageLength > 0) {
+		cout<<message<<endl;
+		Client client(port);
+		client.sendData(message);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+
