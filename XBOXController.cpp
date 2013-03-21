@@ -73,10 +73,10 @@ void main()
 
    system("color 0a"); 
 
-    cout << "Instructions:\n";
-    cout << "Press [A] to vibrate left only\n";
-    cout << "Press [B] to vibrate right only\n";
-    cout << "Press [BACK] to exit\n";          
+    //cout << "Instructions:\n";
+    //cout << "Press [A] to vibrate left only\n";
+    //cout << "Press [B] to vibrate right only\n";
+    //cout << "Press [BACK] to exit\n";
 
     while(true){ 	
         if(player0->IsXBOXControlConnected()){
@@ -85,12 +85,12 @@ void main()
 		}
 		else{
 
-			cout << "\nERROR! PLAYER 1 - XBOX 360 Controller Not Found!\n";
-					cout << "Press Any Key To Exit.";
+			//cout << "\nERROR! PLAYER 1 - XBOX 360 Controller Not Found!\n";
+					//cout << "Press Any Key To Exit.";
 					cin.get();
 					break;
 		}
-        Sleep(50);
+        Sleep(500);
 
      }
 }
@@ -103,21 +103,21 @@ void XBOXController::readControllerInput() {
 	if(pressed & XINPUT_GAMEPAD_B)
 	{
 		std::stringstream s;
-		s<<STOP_CMD;
+		s<<(char)STOP_CMD;
 		sendData(s.str());
 	}
 
 	if(pressed & XINPUT_GAMEPAD_BACK)
 	{
 		std::stringstream s;
-		s<<AUTO_MANUAL_TOGGLE;
+		s<<(char)AUTO_MANUAL_TOGGLE;
 		sendData(s.str());
 
 	}
 
 	if(pressed & XINPUT_GAMEPAD_Y) {
 		std::stringstream s;
-		s<<RUN_HOPPER;
+		s<<(char)RUN_HOPPER;
 		currentHopperSpeed = 0;
 		s<<sizeof(currentHopperSpeed);
 		s<<currentHopperSpeed;
@@ -126,20 +126,20 @@ void XBOXController::readControllerInput() {
 
 	if(pressed & XINPUT_GAMEPAD_X) {
 		std::stringstream s;
-		s<<STOP_HOPPER;
+		s<<(char)STOP_HOPPER;
 		sendData(s.str());
 	}
 
 	if(pressed & XINPUT_GAMEPAD_START) {
 		std::stringstream s;
-		s<<START_CMD;
+		s<<(char)START_CMD;
 		sendData(s.str());
 	}
 
 	if(pressed & XINPUT_GAMEPAD_DPAD_DOWN) {
 		currentHopperSpeed--;
 		std::stringstream s;
-		s<<RUN_HOPPER;
+		s<<(char)RUN_HOPPER;
 		s<<sizeof(currentHopperSpeed);
 		s<<currentHopperSpeed;
 		sendData(s.str());
@@ -148,7 +148,7 @@ void XBOXController::readControllerInput() {
 	if(pressed & XINPUT_GAMEPAD_DPAD_UP) {
 		currentHopperSpeed++;
 		std::stringstream s;
-		s<<RUN_HOPPER;
+		s<<(char)RUN_HOPPER;
 		s<<sizeof(currentHopperSpeed);
 		s<<currentHopperSpeed;
 		sendData(s.str());
@@ -156,19 +156,19 @@ void XBOXController::readControllerInput() {
 
 	if(pressed & XINPUT_GAMEPAD_DPAD_LEFT) {
 		std::stringstream s;
-		s<<TEST_MODE_TOGGLE;
+		s<<(char)TEST_MODE_TOGGLE;
 		sendData(s.str());
 	}
 
 	if(pressed & XINPUT_GAMEPAD_LEFT_SHOULDER) {
 		std::stringstream s;
-		s<<RAISE_LADDER;
+		s<<(char)RAISE_LADDER;
 		sendData(s.str());
 	}
 
 	if(gamepad.bLeftTrigger>0) {
 		std::stringstream s;
-		s<<LOWER_LADDER;
+		s<<(char)LOWER_LADDER;
 		int leftTrigger = gamepad.bLeftTrigger;
 		s<<sizeof(leftTrigger);
 		s<<leftTrigger;
@@ -176,27 +176,47 @@ void XBOXController::readControllerInput() {
 	}
 	if(gamepad.bRightTrigger>0) {
 		std::stringstream s;
-		s<<RUN_LADDER;
+		s<<(char)RUN_LADDER;
 		int rightTrigger = gamepad.bRightTrigger;
 		s<<sizeof(rightTrigger);
 		s<<rightTrigger;
 		sendData(s.str());
 	}
-
+	//cout<<"here"<<endl;
 	if(abs(gamepad.sThumbRY)-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE>0 && gamepad.sThumbRY<32768) {
 		std::stringstream s;
-		s<<CHANGE_DIRECTION;
-		currentRightSide = gamepad.sThumbRY;
-//		cout<<currentRightSide<<endl;
-		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
-		s<<currentRightSide;
-		s<<currentLeftSide;
+		s<<(char)CHANGE_DIRECTION;
 		sendData(s.str());
+		cout<<"CHANGE_DIRECTION: "<<atoi(s.str().c_str())<<endl;
+		std::stringstream s1;
+		//currentRightSide = ((gamepad.sThumbRY));
+		unsigned int right = gamepad.sThumbRY;
+		currentRightSide = (char)(right/256);
+
+
+		cout<<"Right side: "<<int(currentRightSide)<<"-------------------------------------------"<<endl;
+
+
+		s1<<sizeof(currentRightSide) + sizeof(currentLeftSide);
+		sendData(s1.str());
+		cout<<"Size: "<<atoi(s1.str().c_str())<<endl;
+		std::stringstream s2;
+		s2<<currentRightSide;
+		cout<<"Right side: "<<atoi(s2.str().c_str())<<endl;
+		sendData(s2.str());
+		std::stringstream s3;
+		currentLeftSide = 127;
+		s3<<currentLeftSide;
+		cout<<"Left side: "<<atoi(s3.str().c_str())<<endl;
+		sendData(s3.str());
 	}
 	if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE>0 && gamepad.sThumbLY<32768) {
 		std::stringstream s;
-		s<<CHANGE_DIRECTION;
-		currentLeftSide = gamepad.sThumbLY;
+		s<<(char)CHANGE_DIRECTION;
+		//cout<<"left"<<endl;
+		//currentLeftSide = (gamepad.sThumbLY)/128;
+		int left = gamepad.sThumbLY;
+		currentLeftSide = (char)(left/512 + 127);
 		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
 		s<<currentRightSide;
 		s<<currentLeftSide;

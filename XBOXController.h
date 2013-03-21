@@ -36,9 +36,9 @@ public:
 	void readControllerInput();
 private:
 	int port;
-	int currentLeftSide;
-	int currentRightSide;
-	int currentHopperSpeed;
+	char currentLeftSide;
+	char currentRightSide;
+	char currentHopperSpeed;
 	bool sendData(std::string);
 	int XBOX_CONTROLLER_NUM;
 	XINPUT_STATE XBOX_CONTROLLER_State;
