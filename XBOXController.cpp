@@ -186,9 +186,9 @@ void XBOXController::readControllerInput() {
 	if(abs(gamepad.sThumbRY)-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE>0 && gamepad.sThumbRY<32768) {
 		std::stringstream s;
 		s<<(char)CHANGE_DIRECTION;
-		sendData(s.str());
-		cout<<"CHANGE_DIRECTION: "<<atoi(s.str().c_str())<<endl;
-		std::stringstream s1;
+		//sendData(s.str());
+		cout<<"CHANGE_DIRECTION: "<<(int)(s.str().c_str())<<endl;
+		//std::stringstream s1;
 		//currentRightSide = ((gamepad.sThumbRY));
 		unsigned int right = gamepad.sThumbRY;
 		currentRightSide = (char)(right/256);
@@ -197,18 +197,18 @@ void XBOXController::readControllerInput() {
 		cout<<"Right side: "<<int(currentRightSide)<<"-------------------------------------------"<<endl;
 
 
-		s1<<sizeof(currentRightSide) + sizeof(currentLeftSide);
-		sendData(s1.str());
-		cout<<"Size: "<<atoi(s1.str().c_str())<<endl;
-		std::stringstream s2;
-		s2<<currentRightSide;
-		cout<<"Right side: "<<atoi(s2.str().c_str())<<endl;
-		sendData(s2.str());
-		std::stringstream s3;
-		currentLeftSide = 127;
-		s3<<currentLeftSide;
-		cout<<"Left side: "<<atoi(s3.str().c_str())<<endl;
-		sendData(s3.str());
+		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
+		//sendData(s1.str());
+		//cout<<"Size: "<<atoi(s1.str().c_str())<<endl;
+		//std::stringstream s2;
+		s<<currentRightSide;
+		//cout<<"Right side: "<<atoi(s2.str().c_str())<<endl;
+		//sendData(s2.str());
+		//std::stringstream s3;
+		currentLeftSide = 0;
+		s<<currentLeftSide;
+		//cout<<"Left side: "<<atoi(s3.str().c_str())<<endl;
+		sendData(s.str());
 	}
 	if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE>0 && gamepad.sThumbLY<32768) {
 		std::stringstream s;
@@ -216,7 +216,7 @@ void XBOXController::readControllerInput() {
 		//cout<<"left"<<endl;
 		//currentLeftSide = (gamepad.sThumbLY)/128;
 		int left = gamepad.sThumbLY;
-		currentLeftSide = (char)(left/512 + 127);
+		currentLeftSide = (char)(left/256);
 		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
 		s<<currentRightSide;
 		s<<currentLeftSide;
