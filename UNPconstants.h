@@ -15,7 +15,8 @@
 #define FATAL_ERROR_STOP	0x0E
 #define START_CMD			0x11
 #define STOP_CMD			0x12
-#define CHANGE_DIRECTION	0x14
+#define CHANGE_RIGHT		0x14
+#define CHANGE_LEFT			0x18
 #define ROBOT_START			0x21
 #define AUTO_MANUAL_TOGGLE	0x24
 #define TEST_MODE_TOGGLE	0x28

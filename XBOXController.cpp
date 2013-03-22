@@ -185,9 +185,9 @@ void XBOXController::readControllerInput() {
 	//cout<<"here"<<endl;
 	if(abs(gamepad.sThumbRY)-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE>0 && gamepad.sThumbRY<32768) {
 		std::stringstream s;
-		s<<(char)CHANGE_DIRECTION;
+		s<<(char)CHANGE_RIGHT;
 		//sendData(s.str());
-		cout<<"CHANGE_DIRECTION: "<<(int)(s.str().c_str())<<endl;
+		cout<<"CHANGE_RIGHT: "<<(int)(s.str().c_str())<<endl;
 		//std::stringstream s1;
 		//currentRightSide = ((gamepad.sThumbRY));
 		unsigned int right = gamepad.sThumbRY;
@@ -212,7 +212,7 @@ void XBOXController::readControllerInput() {
 	}
 	if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE>0 && gamepad.sThumbLY<32768) {
 		std::stringstream s;
-		s<<(char)CHANGE_DIRECTION;
+		s<<(char)CHANGE_LEFT;
 		//cout<<"left"<<endl;
 		//currentLeftSide = (gamepad.sThumbLY)/128;
 		int left = gamepad.sThumbLY;
