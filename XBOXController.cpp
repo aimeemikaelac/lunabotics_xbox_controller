@@ -191,13 +191,14 @@ void XBOXController::readControllerInput() {
 		//std::stringstream s1;
 		//currentRightSide = ((gamepad.sThumbRY));
 		unsigned int right = gamepad.sThumbRY;
-		currentRightSide = (char)(right/256);
+		currentRightSide = (char)(right/256+128);
 
+		char buffer[50];
+		sprintf(buffer, "%x = %u = %d", currentRightSide, currentRightSide, currentRightSide);
+		//cout<<"Right side: "<<buffer<<"-------------------------------------------"<<endl;
+		printf("Right side: %s",buffer);
 
-		cout<<"Right side: "<<int(currentRightSide)<<"-------------------------------------------"<<endl;
-
-
-		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
+		//s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
 		//sendData(s1.str());
 		//cout<<"Size: "<<atoi(s1.str().c_str())<<endl;
 		//std::stringstream s2;
@@ -205,21 +206,26 @@ void XBOXController::readControllerInput() {
 		//cout<<"Right side: "<<atoi(s2.str().c_str())<<endl;
 		//sendData(s2.str());
 		//std::stringstream s3;
-		currentLeftSide = 0;
-		s<<currentLeftSide;
+		//currentLeftSide = 0;
+		//s<<currentLeftSide;
 		//cout<<"Left side: "<<atoi(s3.str().c_str())<<endl;
 		sendData(s.str());
 	}
 	if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE>0 && gamepad.sThumbLY<32768) {
 		std::stringstream s;
 		s<<(char)CHANGE_LEFT;
+		cout<<"CHANGE_LEFT: "<<(int)(s.str().c_str())<<endl;
 		//cout<<"left"<<endl;
 		//currentLeftSide = (gamepad.sThumbLY)/128;
 		int left = gamepad.sThumbLY;
-		currentLeftSide = (char)(left/256);
-		s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
-		s<<currentRightSide;
+		currentLeftSide = (char)(left/256+128);
+		//s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
+		//s<<currentRightSide;
 		s<<currentLeftSide;
+		char buffer[50];
+		sprintf(buffer, "%x = %u = %d", currentLeftSide, currentLeftSide, currentLeftSide);
+		//cout<<"Left side: "<<buffer<<"-------------------------------------------"<<endl;
+		printf("Left side: %s",buffer);
 		sendData(s.str());
 	}
 
