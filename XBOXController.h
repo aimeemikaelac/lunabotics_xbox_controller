@@ -36,6 +36,7 @@ public:
 	void readControllerInput();
 private:
 	int port;
+	bool needToSend;
 	char currentLeftSide;
 	char currentRightSide;
 	char currentHopperSpeed;

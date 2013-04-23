@@ -23,8 +23,9 @@ XBOXController::XBOXController(int num, int port) {
 	XBOXController::port = port;
 	XBOX_CONTROLLER_NUM = num;
 	currentHopperSpeed = 0;
-	currentLeftSide = 0;
-	currentRightSide = 0;
+	currentLeftSide = 127;
+	currentRightSide = 127;
+	bool needToSend = true;
 }
 
 bool XBOXController::IsXBOXControlConnected()
@@ -90,7 +91,7 @@ void main()
 					cin.get();
 					break;
 		}
-        Sleep(500);
+        Sleep(100);
 
      }
 }
@@ -99,10 +100,15 @@ void XBOXController::readControllerInput() {
 	XINPUT_GAMEPAD gamepad = GetState().Gamepad;//player0->GetState().Gamepad;
 	WORD pressed = GetState().Gamepad.wButtons;//player0->GetState().Gamepad.wButtons;
 	string pressedButtons = "";
+	bool leftChanged = false;
+	bool rightChanged = false;
 
 	if(pressed & XINPUT_GAMEPAD_B)
 	{
+		currentLeftSide = 127;
+		currentRightSide = 127;
 		std::stringstream s;
+		cout<<STOP_CMD<<endl;
 		s<<(char)STOP_CMD;
 		sendData(s.str());
 	}
@@ -131,6 +137,8 @@ void XBOXController::readControllerInput() {
 	}
 
 	if(pressed & XINPUT_GAMEPAD_START) {
+		currentLeftSide = 127;
+		currentRightSide = 127;
 		std::stringstream s;
 		s<<(char)START_CMD;
 		sendData(s.str());
@@ -184,48 +192,132 @@ void XBOXController::readControllerInput() {
 	}
 	//cout<<"here"<<endl;
 	if(abs(gamepad.sThumbRY)-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE>0 && gamepad.sThumbRY<32768) {
+		rightChanged = true;
+		needToSend = true;
 		std::stringstream s;
 		s<<(char)CHANGE_RIGHT;
 		//sendData(s.str());
-		cout<<"CHANGE_RIGHT: "<<(int)(s.str().c_str())<<endl;
+		//cout<<"CHANGE_RIGHT: "<<(int)(s.str().c_str())<<endl;
 		//std::stringstream s1;
 		//currentRightSide = ((gamepad.sThumbRY));
 		unsigned int right = gamepad.sThumbRY;
 		currentRightSide = (char)(right/256+128);
 
-		char buffer[50];
+		char buffer[100];
 		sprintf(buffer, "%x = %u = %d", currentRightSide, currentRightSide, currentRightSide);
 		//cout<<"Right side: "<<buffer<<"-------------------------------------------"<<endl;
-		printf("Right side: %s",buffer);
+		//printf("Right side: %s",buffer);
 
 		//s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
 		//sendData(s1.str());
 		//cout<<"Size: "<<atoi(s1.str().c_str())<<endl;
 		//std::stringstream s2;
-		s<<currentRightSide;
+		if(currentLeftSide == 0) {
+				currentLeftSide = 1;
+		}
+		if(currentRightSide == 0) {
+				currentRightSide = 1;
+		}
+		if(currentLeftSide != 127) {
+			char a = 0x50;
+			s<<a;
+			
+			s<<currentLeftSide;
+		}
+		else {
+			char b = 0x70;
+			s<<b;
+		}
+		
+		if(currentRightSide != 127) {
+			char a = 0x50;
+			s<<a;
+			s<<currentRightSide;
+		}
+		else {
+			char b = 0x70;
+			s<<b;
+		}
+		
+		
 		//cout<<"Right side: "<<atoi(s2.str().c_str())<<endl;
 		//sendData(s2.str());
 		//std::stringstream s3;
 		//currentLeftSide = 0;
 		//s<<currentLeftSide;
 		//cout<<"Left side: "<<atoi(s3.str().c_str())<<endl;
+		sprintf(buffer, "CHANGE_RIGHT: %s %d %d %d %d %d",s.str(), CHANGE_RIGHT, 0x70, currentLeftSide, 0x50, currentRightSide);
+		cout<<buffer<<endl;
+		//cout<<s.str()<<endl;
 		sendData(s.str());
 	}
 	if(abs(gamepad.sThumbLY)-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE>0 && gamepad.sThumbLY<32768) {
+		leftChanged = true;
+		needToSend = true;
 		std::stringstream s;
-		s<<(char)CHANGE_LEFT;
-		cout<<"CHANGE_LEFT: "<<(int)(s.str().c_str())<<endl;
+		//TODO: change change right to change direction
+		s<<(char)CHANGE_RIGHT;
+		//cout<<"CHANGE_LEFT: "<<(int)(s.str().c_str())<<endl;
 		//cout<<"left"<<endl;
 		//currentLeftSide = (gamepad.sThumbLY)/128;
 		int left = gamepad.sThumbLY;
 		currentLeftSide = (char)(left/256+128);
 		//s<<sizeof(currentRightSide) + sizeof(currentLeftSide);
-		//s<<currentRightSide;
-		s<<currentLeftSide;
-		char buffer[50];
-		sprintf(buffer, "%x = %u = %d", currentLeftSide, currentLeftSide, currentLeftSide);
+		if(currentLeftSide == 0) {
+				currentLeftSide = 1;
+		}
+		if(currentRightSide == 0) {
+				currentRightSide = 1;
+		}
+		if(currentLeftSide != 127) {
+			char a = 0x50;
+			s<<a;
+			s<<currentLeftSide;
+		}
+		else {
+			char b = 0x70;
+			s<<b;
+		}
+		
+		if(currentRightSide != 127) {
+			char a = 0x50;
+			s<<a;
+			s<<currentRightSide;
+		}
+		else {
+			char b = 0x70;
+			s<<b;
+		}
+		
+		char buffer[100];
+		//sprintf(buffer, "%x = %u = %d", currentLeftSide, currentLeftSide, currentLeftSide);
 		//cout<<"Left side: "<<buffer<<"-------------------------------------------"<<endl;
-		printf("Left side: %s",buffer);
+		//sprintf(buffer,"Left side: %s",s.str());
+		//cout<<"--------------------------------------"<<endl;
+		sprintf(buffer, "CHANGE_LEFT: %s %d %d %d %d %d",s.str(), CHANGE_RIGHT, 0x70, currentLeftSide, 0x50, currentRightSide);
+		cout<<buffer<<"-------------------------------"<<endl;
+		//cout<<s.str()<<endl;
+		sendData(s.str());
+	}
+	if(needToSend && (!leftChanged || !rightChanged)) {
+		needToSend = false;
+		if(!leftChanged) {
+			currentLeftSide = 127;
+		}
+		if(!rightChanged) {
+			currentRightSide = 127;
+		}
+		std::stringstream s;
+		s<<(char)CHANGE_RIGHT;
+		char a = 0x50;
+		s<<a;
+		a = currentLeftSide;
+		s<<a;
+		a = 0x50;
+		s<<a;
+		a = currentRightSide;
+		s<<a;
+		cout<<"sending zero -------------------------------"<<endl;
 		sendData(s.str());
 	}
 
