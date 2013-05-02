@@ -37,6 +37,8 @@ public:
 private:
 	int port;
 	bool needToSend;
+	bool stopSendingInAutoMode;
+	bool started;
 	char currentLeftSide;
 	char currentRightSide;
 	char currentHopperSpeed;

@@ -25,7 +25,9 @@ XBOXController::XBOXController(int num, int port) {
 	currentHopperSpeed = 0;
 	currentLeftSide = 127;
 	currentRightSide = 127;
-	bool needToSend = true;
+	needToSend = true;
+	started = false;
+	stopSendingInAutoMode = false;
 }
 
 bool XBOXController::IsXBOXControlConnected()
@@ -91,7 +93,7 @@ void main()
 					cin.get();
 					break;
 		}
-        Sleep(100);
+        Sleep(400);
 
      }
 }
@@ -103,6 +105,20 @@ void XBOXController::readControllerInput() {
 	bool leftChanged = false;
 	bool rightChanged = false;
 
+	
+
+	if(pressed & XINPUT_GAMEPAD_BACK)
+	{
+		std::stringstream s;
+		s<<(char)AUTO_MANUAL_TOGGLE;
+		sendData(s.str());
+		stopSendingInAutoMode = !stopSendingInAutoMode;
+	}
+
+	if(stopSendingInAutoMode == true) {
+		return;
+	}
+
 	if(pressed & XINPUT_GAMEPAD_B)
 	{
 		currentLeftSide = 127;
@@ -111,15 +127,10 @@ void XBOXController::readControllerInput() {
 		cout<<STOP_CMD<<endl;
 		s<<(char)STOP_CMD;
 		sendData(s.str());
+		started = false;
 	}
 
-	if(pressed & XINPUT_GAMEPAD_BACK)
-	{
-		std::stringstream s;
-		s<<(char)AUTO_MANUAL_TOGGLE;
-		sendData(s.str());
-
-	}
+	
 
 	if(pressed & XINPUT_GAMEPAD_Y) {
 		std::stringstream s;
@@ -142,6 +153,7 @@ void XBOXController::readControllerInput() {
 		std::stringstream s;
 		s<<(char)START_CMD;
 		sendData(s.str());
+		started = true;
 	}
 
 	if(pressed & XINPUT_GAMEPAD_DPAD_DOWN) {
@@ -180,6 +192,12 @@ void XBOXController::readControllerInput() {
 		int leftTrigger = gamepad.bLeftTrigger;
 		s<<sizeof(leftTrigger);
 		s<<leftTrigger;
+		sendData(s.str());
+	}
+
+	if(pressed & XINPUT_GAMEPAD_A) {
+		std::stringstream s;
+		s<<(char)RUN_LADDER;
 		sendData(s.str());
 	}
 	if(gamepad.bRightTrigger>0) {
@@ -295,11 +313,12 @@ void XBOXController::readControllerInput() {
 		//sprintf(buffer,"Left side: %s",s.str());
 		//cout<<"--------------------------------------"<<endl;
 		sprintf(buffer, "CHANGE_LEFT: %s %d %d %d %d %d",s.str(), CHANGE_RIGHT, 0x70, currentLeftSide, 0x50, currentRightSide);
+		
 		cout<<buffer<<"-------------------------------"<<endl;
 		//cout<<s.str()<<endl;
 		sendData(s.str());
 	}
-	if(needToSend && (!leftChanged || !rightChanged)) {
+	if((started == true) && (!leftChanged || !rightChanged)) {
 		needToSend = false;
 		if(!leftChanged) {
 			currentLeftSide = 127;
@@ -317,8 +336,11 @@ void XBOXController::readControllerInput() {
 		s<<a;
 		a = currentRightSide;
 		s<<a;
-		cout<<"sending zero -------------------------------"<<endl;
-		sendData(s.str());
+		int j = 0;
+		//for(j=0; j<15; j++) {
+			cout<<"sending zero -------------------------------"<<endl;
+			sendData(s.str());
+		//}
 	}
 
 }
